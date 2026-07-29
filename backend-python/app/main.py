@@ -38,6 +38,7 @@ from app.api.grc_routes import router as grc_router
 from app.api.helpdesk_routes import router as helpdesk_router
 from app.api.executive_routes import router as executive_router
 from app.api.analytics_routes import router as analytics_router
+from app.api.observability_routes import router as observability_router
 from app.middleware.tenant_middleware import TenantIsolationMiddleware
 
 app = FastAPI(
@@ -85,13 +86,14 @@ app.include_router(grc_router, prefix=settings.API_V1_STR)
 app.include_router(helpdesk_router, prefix=settings.API_V1_STR)
 app.include_router(executive_router, prefix=settings.API_V1_STR)
 app.include_router(analytics_router, prefix=settings.API_V1_STR)
+app.include_router(observability_router, prefix=settings.API_V1_STR)
 
 @app.get("/health")
 @app.get(f"{settings.API_V1_STR}/health")
 def health_check():
     return {
         "status": "online",
-        "engine": "Python FastAPI + Identity + Workflow + AI Core + LangGraph Supervisor + Integrations + RAG + Notifications + Recruitment + Candidate Experience + ATS + Resume Intelligence + Interview Intelligence + Assessment Intelligence + Offer Intelligence + Employee Onboarding + Core Employee SSOT + Attendance + Leave + Global Payroll + Performance Management + Enterprise Learning + Enterprise Asset Management + Enterprise GRC + Enterprise Helpdesk + Enterprise Executive AI + Enterprise Workforce Analytics Platform",
+        "engine": "Python FastAPI + Identity + Workflow + AI Core + LangGraph Supervisor + Integrations + RAG + Notifications + Recruitment + Candidate Experience + ATS + Resume Intelligence + Interview Intelligence + Assessment Intelligence + Offer Intelligence + Employee Onboarding + Core Employee SSOT + Attendance + Leave + Global Payroll + Performance Management + Enterprise Learning + Enterprise Asset Management + Enterprise GRC + Enterprise Helpdesk + Enterprise Executive AI + Enterprise Workforce Analytics + Enterprise Observability Platform",
         "version": "1.0.0"
     }
 

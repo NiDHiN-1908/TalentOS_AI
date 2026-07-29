@@ -1,0 +1,32 @@
+groups:
+  - name: talentos_sre_alerts
+    rules:
+      - alert: TalentOSHighErrorRateSLOBreach
+        expr: (sum(rate(talentos_http_requests_total{status=~"5.."}[5m])) / sum(rate(talentos_http_requests_total[5m]))) * 100 > 0.1
+        for: 5m
+        labels:
+          severity: critical
+          service: talentos-ai-core
+        annotations:
+          summary: "TalentOS AI 99.9% Availability SLO Breach"
+          description: "HTTP 5xx error rate has exceeded 0.1% for over 5 minutes. Triggering PagerDuty on-call."
+
+      - alert: TalentOSHighLatencyP95
+        expr: talentos_http_request_duration_p95_ms > 200
+        for: 5m
+        labels:
+          severity: warning
+          service: talentos-ai-core
+        annotations:
+          summary: "TalentOS AI High P95 Latency Warning"
+          description: "P95 latency has exceeded 200ms for over 5 minutes."
+
+      - alert: TalentOSAIInferenceFailure
+        expr: talentos_ai_inference_duration_seconds > 5.0
+        for: 2m
+        labels:
+          severity: critical
+          service: talentos-ai-agent
+        annotations:
+          summary: "LLM Agent Inference Timeout"
+          description: "AI Copilot inference duration exceeded 5.0s timeout."
