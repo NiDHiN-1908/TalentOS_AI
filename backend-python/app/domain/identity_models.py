@@ -19,7 +19,7 @@ class SystemRole(str, Enum):
     GUEST = "GUEST"
 
 class UserRegisterRequest(BaseModel):
-    email: EmailStr
+    email: str
     password: str = Field(..., min_length=8)
     first_name: str
     last_name: str
@@ -27,7 +27,7 @@ class UserRegisterRequest(BaseModel):
     domain: Optional[str] = None
 
 class UserLoginRequest(BaseModel):
-    email: EmailStr
+    email: str
     password: str
     device_info: Optional[str] = Field(default="Chrome / macOS")
 

@@ -58,40 +58,46 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, onOpenA
       alignItems: 'center',
       justifyContent: 'space-between',
       padding: '12px 24px',
-      background: 'rgba(11, 15, 25, 0.88)',
-      backdropFilter: 'blur(20px)',
+      background: 'rgba(9, 13, 22, 0.92)',
+      backdropFilter: 'blur(16px)',
       borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
       position: 'sticky',
       top: 0,
       zIndex: 100
     }}>
-      {/* Brand & Status */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-        <div style={{
-          width: '36px',
-          height: '36px',
-          borderRadius: '10px',
-          background: 'linear-gradient(135deg, #6366f1 0%, #a855f7 100%)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          boxShadow: '0 0 16px rgba(99, 102, 241, 0.5)'
-        }}>
-          <Bot size={20} color="#fff" />
-        </div>
-        <div>
-          <h1 style={{ fontSize: '1.2rem', fontWeight: 800, letterSpacing: '-0.02em', background: 'linear-gradient(90deg, #fff 0%, #cbd5e1 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-            TalentOS <span style={{ color: '#6366f1', WebkitTextFillColor: '#6366f1' }}>AI</span>
-          </h1>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.68rem', color: '#94a3b8' }}>
-            <span className="pulsing-dot" />
-            <span>Agent Active</span>
+      {/* Brand & Workspace Switcher */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <div style={{
+            width: '32px',
+            height: '32px',
+            borderRadius: '8px',
+            background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            boxShadow: '0 0 12px rgba(16, 185, 129, 0.3)'
+          }}>
+            <Bot size={18} color="#000" />
           </div>
+          <div>
+            <h1 style={{ fontSize: '1.05rem', fontWeight: 700, letterSpacing: '-0.02em', color: '#f8fafc' }}>
+              TalentOS <span style={{ color: '#10b981' }}>AI</span>
+            </h1>
+          </div>
+        </div>
+
+        <div style={{ height: '20px', width: '1px', background: 'rgba(255, 255, 255, 0.1)' }} />
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.78rem', color: '#94a3b8', fontWeight: 500 }}>
+          <span>Acme Corp</span>
+          <span style={{ color: '#64748b' }}>/</span>
+          <span style={{ color: '#f8fafc', fontWeight: 600 }}>Production</span>
         </div>
       </div>
 
       {/* Navigation Tabs */}
-      <nav style={{ display: 'flex', gap: '3px', background: 'rgba(255, 255, 255, 0.03)', padding: '3px', borderRadius: '10px', border: '1px solid rgba(255, 255, 255, 0.05)', flexWrap: 'wrap' }}>
+      <nav style={{ display: 'flex', gap: '2px', background: 'rgba(255, 255, 255, 0.02)', padding: '3px', borderRadius: '8px', border: '1px solid rgba(255, 255, 255, 0.05)', flexWrap: 'wrap' }}>
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = activeTab === item.id;
@@ -102,19 +108,19 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, onOpenA
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: '5px',
+                gap: '6px',
                 padding: '6px 10px',
                 borderRadius: '6px',
                 border: 'none',
-                background: isActive ? 'rgba(99, 102, 241, 0.2)' : 'transparent',
-                color: isActive ? '#fff' : '#94a3b8',
+                background: isActive ? 'rgba(16, 185, 129, 0.15)' : 'transparent',
+                color: isActive ? '#10b981' : '#94a3b8',
                 fontWeight: isActive ? 600 : 500,
                 fontSize: '0.78rem',
                 cursor: 'pointer',
                 transition: 'all 0.15s ease'
               }}
             >
-              <Icon size={14} color={isActive ? '#6366f1' : '#94a3b8'} />
+              <Icon size={14} color={isActive ? '#10b981' : '#94a3b8'} />
               <span>{item.label}</span>
             </button>
           );
@@ -122,20 +128,21 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, onOpenA
       </nav>
 
       {/* Right Controls */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
         <button
           onClick={onOpenCommandPalette}
           className="btn-secondary"
-          style={{ padding: '6px 10px', fontSize: '0.75rem' }}
+          style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '6px 12px', fontSize: '0.75rem' }}
         >
-          <Search size={13} color="#6366f1" />
-          <span>Cmd+K</span>
+          <Search size={13} color="#94a3b8" />
+          <span style={{ color: '#64748b' }}>Search</span>
+          <span style={{ background: 'rgba(255,255,255,0.08)', padding: '1px 5px', borderRadius: '4px', fontSize: '0.68rem', color: '#94a3b8' }}>⌘K</span>
         </button>
 
         <button
           onClick={onOpenApprovals}
           className="btn-secondary"
-          style={{ position: 'relative', padding: '6px 10px', fontSize: '0.75rem' }}
+          style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: '6px', padding: '6px 12px', fontSize: '0.75rem' }}
         >
           <ShieldAlert size={14} color={approvalsCount > 0 ? '#f43f5e' : '#94a3b8'} />
           <span>Approvals</span>
@@ -145,9 +152,8 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, onOpenA
               color: '#fff',
               fontSize: '0.65rem',
               fontWeight: 700,
-              padding: '1px 5px',
-              borderRadius: '8px',
-              marginLeft: '4px'
+              padding: '1px 6px',
+              borderRadius: '9999px'
             }}>
               {approvalsCount}
             </span>
