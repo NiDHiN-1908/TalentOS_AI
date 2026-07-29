@@ -68,7 +68,28 @@ export class RecruitmentService {
 
   public static parseResume(rawText: string, candidateId: string): ResumeParseResult {
     const result = RecruitmentAgentEngine.parseResumeText(rawText, candidateId);
-    AuditService.log(hrStore.getTenantId(), 'RECRUITMENT_AGENT', 'RESUME_PARSED', `Parsed resume for candidate ${candidateId}`);
+    
+    const candidateName = rawText.includes('file:') || rawText.includes('File:')
+      ? rawText.split('.')[0].replace(/.*:\s*/, '').trim()
+      : 'Dr. Elena Vance';
+
+    const newCand: Candidate = {
+      id: `CAN-${Date.now().toString().slice(-4)}`,
+      tenantId: hrStore.getTenantId(),
+      name: candidateName || 'Parsed Candidate',
+      email: 'candidate.parsed@example.com',
+      appliedRole: 'Senior AI Engineer',
+      department: 'Engineering',
+      experienceYears: result.experienceYears || 7,
+      matchScore: result.matchScore || 94,
+      resumeSummary: result.summary || 'Extracted candidate profile from uploaded resume document.',
+      keySkills: result.skillsExtracted || ['PyTorch', 'TypeScript', 'Multi-Agent Systems'],
+      status: 'Screened',
+      aiRecommendation: result.recommendation || 'Strong Hire: Top 5% candidate recommended for technical interview'
+    };
+
+    hrStore.addCandidate(newCand);
+    AuditService.log(hrStore.getTenantId(), 'RECRUITMENT_AGENT', 'RESUME_PARSED', `Parsed resume and added candidate ${newCand.name}`);
     return result;
   }
 

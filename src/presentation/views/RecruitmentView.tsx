@@ -91,6 +91,7 @@ export const RecruitmentView: React.FC = () => {
     const textToParse = resumeText.trim() || (selectedFileName ? `Parsed document ${selectedFileName}` : 'Experienced Senior AI Engineer');
     const res = RecruitmentService.parseResume(textToParse, selectedCandidate ? selectedCandidate.id : 'CAN-NEW');
     setParsedResult(res);
+    setCandidates(hrStore.getCandidates());
   };
 
   const handleScheduleInterview = (e: React.FormEvent) => {
@@ -326,13 +327,15 @@ export const RecruitmentView: React.FC = () => {
             
             {/* File Dropzone */}
             <div style={{
+              position: 'relative',
               border: '2px dashed rgba(16, 185, 129, 0.4)',
               backgroundColor: '#090d16',
               borderRadius: '8px',
               padding: '20px',
               textAlign: 'center',
               marginBottom: '12px',
-              cursor: 'pointer'
+              cursor: 'pointer',
+              overflow: 'hidden'
             }}>
               <Upload size={24} color="#10b981" style={{ marginBottom: '8px' }} />
               <div style={{ fontSize: '0.82rem', color: '#f8fafc', fontWeight: 600 }}>
