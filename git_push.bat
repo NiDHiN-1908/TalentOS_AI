@@ -5,7 +5,7 @@ git remote remove origin 2>nul
 git remote add origin https://github.com/NiDHiN-1908/TalentOS_AI.git
 git branch -M main
 git add .
-git commit -m "feat: Enterprise Interview Intelligence Platform - Calendar Auto-Scheduling, Question Bank, AI Prep Briefings & Hiring Confidence Score"
+git commit -m "feat: Enterprise Assessment Intelligence Platform - Sandboxed Code Execution, Tab-Switching Proctoring & AI Evaluation Reports"
 git push -u origin main
 echo Git commit and push completed successfully!
 pause
