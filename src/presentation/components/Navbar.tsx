@@ -14,7 +14,8 @@ import {
   Clock,
   Laptop,
   HelpCircle,
-  BarChart3
+  BarChart3,
+  Sparkles
 } from 'lucide-react';
 import { hrStore } from '../../infrastructure/store/hrStore';
 
@@ -39,7 +40,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, onOpenA
 
   const navItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { id: 'orchestrator', label: 'Supervisor', icon: Cpu },
+    { id: 'orchestrator', label: 'Supervisor (AI Core)', icon: Cpu },
     { id: 'recruitment', label: 'Recruitment', icon: Users },
     { id: 'onboarding', label: 'Onboarding', icon: UserPlus },
     { id: 'attendance_leave', label: 'Attendance & Leave', icon: Clock },
@@ -58,7 +59,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, onOpenA
       alignItems: 'center',
       justifyContent: 'space-between',
       padding: '12px 24px',
-      background: 'rgba(9, 13, 22, 0.92)',
+      background: 'rgba(9, 13, 22, 0.95)',
       backdropFilter: 'blur(16px)',
       borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
       position: 'sticky',
@@ -76,12 +77,12 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, onOpenA
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            boxShadow: '0 0 12px rgba(16, 185, 129, 0.3)'
+            boxShadow: '0 0 12px rgba(16, 185, 129, 0.4)'
           }}>
             <Bot size={18} color="#000" />
           </div>
           <div>
-            <h1 style={{ fontSize: '1.05rem', fontWeight: 700, letterSpacing: '-0.02em', color: '#f8fafc' }}>
+            <h1 style={{ fontSize: '1.05rem', fontWeight: 700, letterSpacing: '-0.02em', color: '#f8fafc', margin: 0 }}>
               TalentOS <span style={{ color: '#10b981' }}>AI</span>
             </h1>
           </div>
@@ -92,7 +93,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, onOpenA
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.78rem', color: '#94a3b8', fontWeight: 500 }}>
           <span>Acme Corp</span>
           <span style={{ color: '#64748b' }}>/</span>
-          <span style={{ color: '#f8fafc', fontWeight: 600 }}>Production</span>
+          <span style={{ color: '#f8fafc', fontWeight: 600 }}>Autonomous Production</span>
         </div>
       </div>
 
@@ -128,7 +129,16 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, onOpenA
       </nav>
 
       {/* Right Controls */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <button
+          onClick={() => setActiveTab('orchestrator')}
+          className="btn-primary"
+          style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '6px 12px', fontSize: '0.75rem', backgroundColor: '#10b981', color: '#000' }}
+        >
+          <Sparkles size={14} />
+          <span>⚡ AI Autonomy Center</span>
+        </button>
+
         <button
           onClick={onOpenCommandPalette}
           className="btn-secondary"

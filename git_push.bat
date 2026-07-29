@@ -5,7 +5,7 @@ git remote remove origin 2>nul
 git remote add origin https://github.com/NiDHiN-1908/TalentOS_AI.git
 git branch -M main
 git add .
-git commit -m "style: Master Enterprise SaaS UI Redesign - Linear/Stripe Inspired Design System & Card-Light Layout"
+git commit -m "feat: Add prominent AI Autonomy Center button to Navbar"
 git push -u origin main
 echo Git commit and push completed successfully!
 pause
