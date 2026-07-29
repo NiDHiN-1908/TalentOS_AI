@@ -21,6 +21,7 @@ from app.api.knowledge_routes import router as knowledge_router
 from app.api.notification_routes import router as notification_router
 from app.api.recruitment_routes import router as recruitment_router
 from app.api.candidate_portal_routes import router as candidate_portal_router
+from app.api.ats_routes import router as ats_router
 from app.middleware.tenant_middleware import TenantIsolationMiddleware
 
 app = FastAPI(
@@ -51,13 +52,14 @@ app.include_router(knowledge_router, prefix=settings.API_V1_STR)
 app.include_router(notification_router, prefix=settings.API_V1_STR)
 app.include_router(recruitment_router, prefix=settings.API_V1_STR)
 app.include_router(candidate_portal_router, prefix=settings.API_V1_STR)
+app.include_router(ats_router, prefix=settings.API_V1_STR)
 
 @app.get("/health")
 @app.get(f"{settings.API_V1_STR}/health")
 def health_check():
     return {
         "status": "online",
-        "engine": "Python FastAPI + Identity + Workflow + AI Core + LangGraph Supervisor + Integrations + RAG + Notifications + Recruitment + Candidate Experience Platform",
+        "engine": "Python FastAPI + Identity + Workflow + AI Core + LangGraph Supervisor + Integrations + RAG + Notifications + Recruitment + Candidate Experience + ATS Engine",
         "version": "1.0.0"
     }
 
