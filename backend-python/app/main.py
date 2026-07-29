@@ -36,6 +36,7 @@ from app.api.learning_routes import router as learning_router
 from app.api.asset_routes import router as asset_router
 from app.api.grc_routes import router as grc_router
 from app.api.helpdesk_routes import router as helpdesk_router
+from app.api.executive_routes import router as executive_router
 from app.middleware.tenant_middleware import TenantIsolationMiddleware
 
 app = FastAPI(
@@ -81,13 +82,14 @@ app.include_router(learning_router, prefix=settings.API_V1_STR)
 app.include_router(asset_router, prefix=settings.API_V1_STR)
 app.include_router(grc_router, prefix=settings.API_V1_STR)
 app.include_router(helpdesk_router, prefix=settings.API_V1_STR)
+app.include_router(executive_router, prefix=settings.API_V1_STR)
 
 @app.get("/health")
 @app.get(f"{settings.API_V1_STR}/health")
 def health_check():
     return {
         "status": "online",
-        "engine": "Python FastAPI + Identity + Workflow + AI Core + LangGraph Supervisor + Integrations + RAG + Notifications + Recruitment + Candidate Experience + ATS + Resume Intelligence + Interview Intelligence + Assessment Intelligence + Offer Intelligence + Employee Onboarding + Core Employee SSOT + Attendance + Leave + Global Payroll + Performance Management + Enterprise Learning + Enterprise Asset Management + Enterprise GRC + Enterprise Helpdesk & Service Delivery Platform",
+        "engine": "Python FastAPI + Identity + Workflow + AI Core + LangGraph Supervisor + Integrations + RAG + Notifications + Recruitment + Candidate Experience + ATS + Resume Intelligence + Interview Intelligence + Assessment Intelligence + Offer Intelligence + Employee Onboarding + Core Employee SSOT + Attendance + Leave + Global Payroll + Performance Management + Enterprise Learning + Enterprise Asset Management + Enterprise GRC + Enterprise Helpdesk + Enterprise Executive AI & Decision Intelligence Platform",
         "version": "1.0.0"
     }
 
