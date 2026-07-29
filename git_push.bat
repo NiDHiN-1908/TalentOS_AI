@@ -5,7 +5,7 @@ git remote remove origin 2>nul
 git remote add origin https://github.com/NiDHiN-1908/TalentOS_AI.git
 git branch -M main
 git add .
-git commit -m "feat: Recruitment Intelligence Platform - Job Requisitions, Pipeline Transitions, Offer Generation & Onboarding Triggers"
+git commit -m "feat: Candidate Experience Platform - Public Career Portal, Quick Apply, Application Timeline Tracker & Digital Offer E-Signing"
 git push -u origin main
 echo Git commit and push completed successfully!
 pause
