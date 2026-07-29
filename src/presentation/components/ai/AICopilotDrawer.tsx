@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { useAppStore } from '../../application/stores/useAppStore';
+import { authStore } from '../../infrastructure/store/authStore';
 
 export const AICopilotDrawer: React.FC = () => {
   const { aiCopilotOpen, toggleAICopilot } = useAppStore();
+  const persona = authStore.getCurrentPersona();
   const [messages, setMessages] = useState([
-    { sender: 'AI', text: 'Hello! I am your TalentOS Executive Copilot. How can I assist with your workforce intelligence today?' }
+    { sender: 'AI', text: `Hello ${persona.name}! I am your TalentOS AI Copilot. Operating under ${persona.role} scope permissions.` }
   ]);
   const [inputPrompt, setInputPrompt] = useState('');
 
@@ -12,20 +14,29 @@ export const AICopilotDrawer: React.FC = () => {
 
   const handleSend = () => {
     if (!inputPrompt.trim()) return;
-    const newMsgs = [...messages, { sender: 'User', text: inputPrompt }];
+    const promptText = inputPrompt;
+    const newMsgs = [...messages, { sender: 'User', text: promptText }];
     setMessages(newMsgs);
     setInputPrompt('');
 
-    // Simulated AI response
+    // AI Permission-Aware Scope Evaluator
     setTimeout(() => {
+      let aiText = '';
+      const lower = promptText.toLowerCase();
+
+      if ((lower.includes('salary') || lower.includes('compensation') || lower.includes('ceo')) && persona.role === 'EMPLOYEE') {
+        aiText = '⛔ Access Denied: You do not have authorization to query executive compensation or peer salary metrics.';
+      } else if (lower.includes('payroll') && !['PAYROLL_MANAGER', 'HR_MANAGER', 'PLATFORM_ADMIN'].includes(persona.role)) {
+        aiText = '⛔ Access Denied: Global payroll audits require PAYROLL_MANAGER or HR_MANAGER permissions.';
+      } else {
+        aiText = `Analyzing TalentOS Telemetry for query: "${promptText}". Authorized Scope: ${persona.role}. Organization Health is 95.8% EXCELLENT.`;
+      }
+
       setMessages((prev) => [
         ...prev,
-        { 
-          sender: 'AI', 
-          text: `Analyzing TalentOS Telemetry for query: "${inputPrompt}". Organization Health is 95.8% EXCELLENT. SOC 2 Readiness is 98.2%.` 
-        }
+        { sender: 'AI', text: aiText }
       ]);
-    }, 600);
+    }, 500);
   };
 
   return (
@@ -34,7 +45,10 @@ export const AICopilotDrawer: React.FC = () => {
       <div className="h-16 border-b border-gray-800 px-4 flex items-center justify-between bg-gray-900/50">
         <div className="flex items-center gap-2">
           <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
-          <h3 className="font-bold text-sm text-gray-100">TalentOS AI Copilot</h3>
+          <div>
+            <h3 className="font-bold text-sm text-gray-100">TalentOS AI Copilot</h3>
+            <div className="text-[10px] text-emerald-400 font-semibold">{persona.name} ({persona.role})</div>
+          </div>
         </div>
         <button 
           onClick={toggleAICopilot} 
@@ -55,21 +69,14 @@ export const AICopilotDrawer: React.FC = () => {
             <div className={`p-3 rounded-xl text-xs max-w-[85%] leading-relaxed ${
               m.sender === 'User' 
                 ? 'bg-emerald-500 text-black font-medium' 
-                : 'bg-gray-800 text-gray-200 border border-gray-700'
+                : m.text.includes('Access Denied')
+                  ? 'bg-rose-950/60 text-rose-300 border border-rose-800/60'
+                  : 'bg-gray-800 text-gray-200 border border-gray-700'
             }`}>
               {m.text}
             </div>
           </div>
         ))}
-      </div>
-
-      {/* One-Click Approval Card Placeholder */}
-      <div className="p-3 bg-emerald-950/40 border-t border-emerald-800/40 m-3 rounded-lg text-xs">
-        <div className="font-semibold text-emerald-400 mb-1">⚡ Action Required: Offer Approval</div>
-        <p className="text-gray-300 text-[11px] mb-2">Lead AI Architect offer ($210k base + 15% bonus). Internal equity variance &lt; 2.5%.</p>
-        <button className="w-full bg-emerald-500 hover:bg-emerald-400 text-black font-bold py-1.5 rounded text-xs transition">
-          Approve Offer &amp; Trigger Onboarding
-        </button>
       </div>
 
       {/* Input Box */}
@@ -80,7 +87,7 @@ export const AICopilotDrawer: React.FC = () => {
             value={inputPrompt}
             onChange={(e) => setInputPrompt(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-            placeholder="Ask Executive Copilot..."
+            placeholder={`Ask Copilot (${persona.role} Scope)...`}
             className="flex-1 bg-gray-800 border border-gray-700 text-xs rounded-lg px-3 py-2 text-gray-100 focus:outline-none focus:border-emerald-500"
           />
           <button 

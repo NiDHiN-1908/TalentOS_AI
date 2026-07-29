@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import './presentation/styles/designSystem.css';
 import { ErrorBoundary } from './presentation/components/ErrorBoundary';
+import { Sidebar } from './presentation/components/Sidebar';
 import { Navbar } from './presentation/components/Navbar';
 import { CommandHub } from './presentation/components/CommandHub';
 import { ApprovalsDrawer } from './presentation/components/ApprovalsDrawer';
 import { CommandPalette } from './presentation/components/CommandPalette';
+import { RBXGuard } from './presentation/components/RBXGuard';
 
 import { DashboardView } from './presentation/views/DashboardView';
 import { AgentOrchestratorView } from './presentation/views/AgentOrchestratorView';
@@ -21,6 +23,7 @@ import { AuthView } from './presentation/views/AuthView';
 
 export const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [isApprovalsOpen, setIsApprovalsOpen] = useState(false);
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
 
@@ -33,27 +36,27 @@ export const App: React.FC = () => {
       case 'dashboard':
         return <DashboardView />;
       case 'orchestrator':
-        return <AgentOrchestratorView />;
+        return <RBXGuard moduleId="orchestrator"><AgentOrchestratorView /></RBXGuard>;
       case 'recruitment':
-        return <RecruitmentView />;
+        return <RBXGuard moduleId="recruitment"><RecruitmentView /></RBXGuard>;
       case 'onboarding':
-        return <OnboardingView />;
+        return <RBXGuard moduleId="onboarding"><OnboardingView /></RBXGuard>;
       case 'attendance_leave':
-        return <AttendanceLeaveView />;
+        return <RBXGuard moduleId="attendance_leave"><AttendanceLeaveView /></RBXGuard>;
       case 'payroll':
-        return <PayrollView />;
+        return <RBXGuard moduleId="payroll"><PayrollView /></RBXGuard>;
       case 'performance':
-        return <PerformanceView />;
+        return <RBXGuard moduleId="performance"><PerformanceView /></RBXGuard>;
       case 'learning':
-        return <LearningView />;
+        return <RBXGuard moduleId="learning"><LearningView /></RBXGuard>;
       case 'assets_compliance':
-        return <AssetsComplianceView />;
+        return <RBXGuard moduleId="assets_compliance"><AssetsComplianceView /></RBXGuard>;
       case 'helpdesk_exit':
-        return <HelpdeskExitView />;
+        return <RBXGuard moduleId="helpdesk_exit"><HelpdeskExitView /></RBXGuard>;
       case 'analytics':
-        return <AnalyticsView />;
+        return <RBXGuard moduleId="analytics"><AnalyticsView /></RBXGuard>;
       case 'auth':
-        return <AuthView />;
+        return <RBXGuard moduleId="auth"><AuthView /></RBXGuard>;
       default:
         return <DashboardView />;
     }
@@ -61,50 +64,70 @@ export const App: React.FC = () => {
 
   return (
     <ErrorBoundary>
-      <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+      <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: '#090d16' }}>
         
-        {/* Top Header Navigation */}
-        <Navbar 
+        {/* Enterprise Collapsible Left Sidebar */}
+        <Sidebar 
           activeTab={activeTab} 
-          setActiveTab={setActiveTab} 
-          onOpenApprovals={() => setIsApprovalsOpen(true)}
-          onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
+          setActiveTab={setActiveTab}
+          collapsed={sidebarCollapsed}
+          setCollapsed={setSidebarCollapsed}
         />
 
-        {/* Main Container */}
-        <main style={{ flex: 1, padding: '20px 24px', maxWidth: '1440px', width: '100%', margin: '0 auto' }}>
+        {/* Main Application Area */}
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
           
-          {/* Top Autonomous Command Bar */}
-          <CommandHub onCommandTriggered={handleCommandTriggered} />
+          {/* Top Navigation Bar */}
+          <Navbar 
+            activeTab={activeTab} 
+            setActiveTab={setActiveTab} 
+            onOpenApprovals={() => setIsApprovalsOpen(true)}
+            onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
+          />
 
-          {/* Dynamic View Render */}
-          {renderActiveView()}
-        </main>
+          {/* Canvas Workspace Area */}
+          <main style={{
+            flex: 1,
+            padding: '24px 32px',
+            maxWidth: '1480px',
+            width: '100%',
+            margin: '0 auto',
+            boxSizing: 'border-box'
+          }}>
+            {/* Top Autonomous Command Bar */}
+            <CommandHub onCommandTriggered={handleCommandTriggered} />
 
-        {/* Human In The Loop Approval Modal Drawer */}
+            {/* Active Module View Protected by RBXGuard */}
+            {renderActiveView()}
+          </main>
+
+          {/* Footer */}
+          <footer style={{
+            padding: '16px 32px',
+            borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+            fontSize: '0.75rem',
+            color: '#64748b',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center'
+          }}>
+            <div>TalentOS AI — Dynamic Role-Based Experience (RBX) Engine</div>
+            <div>Enterprise Architecture v1.0 • SOC 2 Type II Certified</div>
+          </footer>
+        </div>
+
+        {/* Approvals Drawer */}
         <ApprovalsDrawer 
           isOpen={isApprovalsOpen} 
           onClose={() => setIsApprovalsOpen(false)} 
         />
 
-        {/* Global Command Palette (Cmd+K) */}
+        {/* Global Command Palette */}
         <CommandPalette
           isOpen={isCommandPaletteOpen}
           onClose={() => setIsCommandPaletteOpen(false)}
           onSelectTab={(tab) => setActiveTab(tab)}
         />
-
-        {/* Footer */}
-        <footer style={{
-          padding: '16px 24px',
-          textAlign: 'center',
-          borderTop: '1px solid rgba(255, 255, 255, 0.05)',
-          fontSize: '0.78rem',
-          color: '#64748b'
-        }}>
-          TalentOS AI — Autonomous Agentic HR Operating System • Enterprise Clean Architecture v1.0
-        </footer>
-
       </div>
     </ErrorBoundary>
   );

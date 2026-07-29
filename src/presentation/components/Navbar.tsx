@@ -1,23 +1,14 @@
 import React from 'react';
 import { 
-  Bot, 
-  LayoutDashboard, 
-  Users, 
-  UserPlus, 
-  CreditCard, 
-  TrendingUp, 
-  GraduationCap, 
   ShieldAlert, 
-  Cpu,
   Search,
-  Lock,
-  Clock,
-  Laptop,
-  HelpCircle,
-  BarChart3,
-  Sparkles
+  Sparkles,
+  ChevronRight,
+  UserCheck
 } from 'lucide-react';
 import { hrStore } from '../../infrastructure/store/hrStore';
+import { authStore } from '../../infrastructure/store/authStore';
+import { SystemRole } from '../../domain/types/rbac';
 
 interface NavbarProps {
   activeTab: string;
@@ -26,110 +17,106 @@ interface NavbarProps {
   onOpenCommandPalette: () => void;
 }
 
-export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, onOpenApprovals, onOpenCommandPalette }) => {
+export const Navbar: React.FC<NavbarProps> = ({ 
+  activeTab, 
+  setActiveTab, 
+  onOpenApprovals, 
+  onOpenCommandPalette 
+}) => {
   const [approvalsCount, setApprovalsCount] = React.useState(0);
+  const [currentPersona, setCurrentPersona] = React.useState(authStore.getCurrentPersona());
 
   React.useEffect(() => {
-    const update = () => {
-      const pending = hrStore.getApprovals().filter(a => a.status === 'pending');
-      setApprovalsCount(pending.length);
+    const updateStore = () => setApprovalsCount(hrStore.getApprovals().filter(a => a.status === 'pending').length);
+    const updateAuth = () => setCurrentPersona(authStore.getCurrentPersona());
+
+    updateStore();
+    updateAuth();
+
+    const unsubStore = hrStore.subscribe(updateStore);
+    const unsubAuth = authStore.subscribe(updateAuth);
+
+    return () => {
+      unsubStore();
+      unsubAuth();
     };
-    update();
-    return hrStore.subscribe(update);
   }, []);
 
-  const navItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { id: 'orchestrator', label: 'Supervisor (AI Core)', icon: Cpu },
-    { id: 'recruitment', label: 'Recruitment', icon: Users },
-    { id: 'onboarding', label: 'Onboarding', icon: UserPlus },
-    { id: 'attendance_leave', label: 'Attendance & Leave', icon: Clock },
-    { id: 'payroll', label: 'Payroll', icon: CreditCard },
-    { id: 'performance', label: 'Performance', icon: TrendingUp },
-    { id: 'learning', label: 'Learning', icon: GraduationCap },
-    { id: 'assets_compliance', label: 'Assets & Compliance', icon: Laptop },
-    { id: 'helpdesk_exit', label: 'Helpdesk & Exit', icon: HelpCircle },
-    { id: 'analytics', label: 'Analytics', icon: BarChart3 },
-    { id: 'auth', label: 'Auth', icon: Lock }
-  ];
+  const handleRoleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newRole = e.target.value as SystemRole;
+    authStore.setPersonaByRole(newRole);
+    // If current tab is now forbidden for new role, default to dashboard
+    if (!authStore.canAccessModule(activeTab)) {
+      setActiveTab('dashboard');
+    }
+  };
+
+  const getTabTitle = (tab: string) => {
+    switch (tab) {
+      case 'dashboard': return 'Executive Dashboard';
+      case 'orchestrator': return 'Supervisor AI Core';
+      case 'recruitment': return 'Recruitment & ATS Workstation';
+      case 'onboarding': return 'Employee Onboarding Engine';
+      case 'attendance_leave': return 'Attendance & Leave Intelligence';
+      case 'payroll': return 'Global Payroll Intelligence';
+      case 'performance': return 'Performance Management & OKRs';
+      case 'learning': return 'Enterprise Learning Intelligence';
+      case 'assets_compliance': return 'Asset Management & GRC';
+      case 'helpdesk_exit': return 'Helpdesk & Offboarding';
+      case 'analytics': return 'Workforce BI Analytics';
+      case 'auth': return 'Security & Identity Systems';
+      default: return 'Dashboard';
+    }
+  };
 
   return (
     <header style={{
+      height: '56px',
+      padding: '0 24px',
+      backgroundColor: '#111726',
+      borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'space-between',
-      padding: '12px 24px',
-      background: 'rgba(9, 13, 22, 0.95)',
-      backdropFilter: 'blur(16px)',
-      borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
       position: 'sticky',
       top: 0,
       zIndex: 100
     }}>
-      {/* Brand & Workspace Switcher */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <div style={{
-            width: '32px',
-            height: '32px',
-            borderRadius: '8px',
-            background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            boxShadow: '0 0 12px rgba(16, 185, 129, 0.4)'
-          }}>
-            <Bot size={18} color="#000" />
-          </div>
-          <div>
-            <h1 style={{ fontSize: '1.05rem', fontWeight: 700, letterSpacing: '-0.02em', color: '#f8fafc', margin: 0 }}>
-              TalentOS <span style={{ color: '#10b981' }}>AI</span>
-            </h1>
-          </div>
-        </div>
-
-        <div style={{ height: '20px', width: '1px', background: 'rgba(255, 255, 255, 0.1)' }} />
-
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.78rem', color: '#94a3b8', fontWeight: 500 }}>
-          <span>Acme Corp</span>
-          <span style={{ color: '#64748b' }}>/</span>
-          <span style={{ color: '#f8fafc', fontWeight: 600 }}>Autonomous Production</span>
-        </div>
+      {/* Breadcrumb Trail */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.82rem' }}>
+        <span style={{ color: '#64748b' }}>Acme Corp</span>
+        <ChevronRight size={14} color="#64748b" />
+        <span style={{ color: '#f8fafc', fontWeight: 600 }}>{getTabTitle(activeTab)}</span>
       </div>
 
-      {/* Navigation Tabs */}
-      <nav style={{ display: 'flex', gap: '2px', background: 'rgba(255, 255, 255, 0.02)', padding: '3px', borderRadius: '8px', border: '1px solid rgba(255, 255, 255, 0.05)', flexWrap: 'wrap' }}>
-        {navItems.map((item) => {
-          const Icon = item.icon;
-          const isActive = activeTab === item.id;
-          return (
-            <button
-              key={item.id}
-              onClick={() => setActiveTab(item.id)}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px',
-                padding: '6px 10px',
-                borderRadius: '6px',
-                border: 'none',
-                background: isActive ? 'rgba(16, 185, 129, 0.15)' : 'transparent',
-                color: isActive ? '#10b981' : '#94a3b8',
-                fontWeight: isActive ? 600 : 500,
-                fontSize: '0.78rem',
-                cursor: 'pointer',
-                transition: 'all 0.15s ease'
-              }}
-            >
-              <Icon size={14} color={isActive ? '#10b981' : '#94a3b8'} />
-              <span>{item.label}</span>
-            </button>
-          );
-        })}
-      </nav>
+      {/* Right Controls & Persona Switcher */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        {/* Dynamic Persona / Role Switcher */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', backgroundColor: '#090d16', border: '1px solid rgba(255, 255, 255, 0.08)', padding: '4px 10px', borderRadius: '6px' }}>
+          <UserCheck size={14} color="#10b981" />
+          <span style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: 600 }}>RBX Persona:</span>
+          <select 
+            value={currentPersona.role}
+            onChange={handleRoleChange}
+            style={{
+              backgroundColor: 'transparent',
+              border: 'none',
+              color: '#10b981',
+              fontWeight: 700,
+              fontSize: '0.78rem',
+              outline: 'none',
+              cursor: 'pointer'
+            }}
+          >
+            <option value="HR_MANAGER" style={{ backgroundColor: '#090d16', color: '#fff' }}>HR Manager (Elena Rostova)</option>
+            <option value="RECRUITER" style={{ backgroundColor: '#090d16', color: '#fff' }}>Recruiter (Sarah Chen)</option>
+            <option value="PAYROLL_MANAGER" style={{ backgroundColor: '#090d16', color: '#fff' }}>Payroll Manager (Marcus Vance)</option>
+            <option value="EMPLOYEE" style={{ backgroundColor: '#090d16', color: '#fff' }}>Employee (Alex Rivera)</option>
+            <option value="EXECUTIVE" style={{ backgroundColor: '#090d16', color: '#fff' }}>Executive (David Sterling)</option>
+            <option value="PLATFORM_ADMIN" style={{ backgroundColor: '#090d16', color: '#fff' }}>Platform Admin (System)</option>
+          </select>
+        </div>
 
-      {/* Right Controls */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
         <button
           onClick={() => setActiveTab('orchestrator')}
           className="btn-primary"
