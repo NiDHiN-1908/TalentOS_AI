@@ -1,0 +1,33 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: talentos-ai-backend-rollout
+  namespace: talentos-production
+spec:
+  replicas: 10
+  strategy:
+    canary:
+      analysis:
+        templates:
+          - templateName: success-rate-analysis
+        args:
+          - name: service-name
+            value: talentos-ai-backend
+      steps:
+        - setWeight: 10
+        - pause: { duration: 10m }
+        - setWeight: 50
+        - pause: { duration: 20m }
+  selector:
+    matchLabels:
+      app: talentos-ai-backend
+  template:
+    metadata:
+      labels:
+        app: talentos-ai-backend
+    spec:
+      containers:
+        - name: backend
+          image: ghcr.io/nidhin-1908/talentos-ai-backend:latest
+          ports:
+            - containerPort: 8000
