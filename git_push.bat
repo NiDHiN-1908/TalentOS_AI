@@ -5,7 +5,7 @@ git remote remove origin 2>nul
 git remote add origin https://github.com/NiDHiN-1908/TalentOS_AI.git
 git branch -M main
 git add .
-git commit -m "feat: Enterprise Governance, Risk & Compliance (GRC) Platform - 5x5 Risk Matrix, SOC 2/ISO 27001 Controls & SHA-256 Audit Evidence"
+git commit -m "feat: Enterprise Employee Helpdesk Platform - Omnichannel Service Catalog, P1-P4 SLA Timers, Virtual AI Assistant & CSAT Surveys"
 git push -u origin main
 echo Git commit and push completed successfully!
 pause
