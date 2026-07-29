@@ -5,7 +5,7 @@ git remote remove origin 2>nul
 git remote add origin https://github.com/NiDHiN-1908/TalentOS_AI.git
 git branch -M main
 git add .
-git commit -m "feat: Add prominent AI Autonomy Center button to Navbar"
+git commit -m "feat: Master Enterprise Release - TalentOS AI World-Class AI-Native Human Resource Operating System"
 git push -u origin main
 echo Git commit and push completed successfully!
 pause
