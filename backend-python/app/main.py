@@ -30,6 +30,7 @@ from app.api.onboarding_routes import router as onboarding_router
 from app.api.employee_routes import router as employee_router
 from app.api.attendance_routes import router as attendance_router
 from app.api.leave_routes import router as leave_router
+from app.api.payroll_routes import router as payroll_router
 from app.middleware.tenant_middleware import TenantIsolationMiddleware
 
 app = FastAPI(
@@ -69,13 +70,14 @@ app.include_router(onboarding_router, prefix=settings.API_V1_STR)
 app.include_router(employee_router, prefix=settings.API_V1_STR)
 app.include_router(attendance_router, prefix=settings.API_V1_STR)
 app.include_router(leave_router, prefix=settings.API_V1_STR)
+app.include_router(payroll_router, prefix=settings.API_V1_STR)
 
 @app.get("/health")
 @app.get(f"{settings.API_V1_STR}/health")
 def health_check():
     return {
         "status": "online",
-        "engine": "Python FastAPI + Identity + Workflow + AI Core + LangGraph Supervisor + Integrations + RAG + Notifications + Recruitment + Candidate Experience + ATS + Resume Intelligence + Interview Intelligence + Assessment Intelligence + Offer Intelligence + Employee Onboarding + Core Employee SSOT + Attendance + Leave Management Platform",
+        "engine": "Python FastAPI + Identity + Workflow + AI Core + LangGraph Supervisor + Integrations + RAG + Notifications + Recruitment + Candidate Experience + ATS + Resume Intelligence + Interview Intelligence + Assessment Intelligence + Offer Intelligence + Employee Onboarding + Core Employee SSOT + Attendance + Leave + Global Payroll Intelligence Platform",
         "version": "1.0.0"
     }
 

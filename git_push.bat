@@ -5,7 +5,7 @@ git remote remove origin 2>nul
 git remote add origin https://github.com/NiDHiN-1908/TalentOS_AI.git
 git branch -M main
 git add .
-git commit -m "feat: Enterprise Leave Management Platform - Accruals Engine, Balance Deduction, Staffing Conflict Checks & Multi-Tier Approvals"
+git commit -m "feat: Enterprise Global Payroll Intelligence Platform - Gross-to-Net Engine, Tax Slabs, NACHA ACH Files & AI Salary Anomaly Audits"
 git push -u origin main
 echo Git commit and push completed successfully!
 pause
