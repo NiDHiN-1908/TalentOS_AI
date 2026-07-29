@@ -3,10 +3,10 @@ import './presentation/styles/designSystem.css';
 import { ErrorBoundary } from './presentation/components/ErrorBoundary';
 import { Sidebar } from './presentation/components/Sidebar';
 import { Navbar } from './presentation/components/Navbar';
-import { CommandHub } from './presentation/components/CommandHub';
 import { ApprovalsDrawer } from './presentation/components/ApprovalsDrawer';
 import { CommandPalette } from './presentation/components/CommandPalette';
 import { RBXGuard } from './presentation/components/RBXGuard';
+import { FloatingAICopilot } from './presentation/components/ai/FloatingAICopilot';
 
 import { DashboardView } from './presentation/views/DashboardView';
 import { AgentOrchestratorView } from './presentation/views/AgentOrchestratorView';
@@ -26,10 +26,7 @@ export const App: React.FC = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [isApprovalsOpen, setIsApprovalsOpen] = useState(false);
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
-
-  const handleCommandTriggered = () => {
-    setActiveTab('orchestrator');
-  };
+  const [isAICopilotOpen, setIsAICopilotOpen] = useState(false);
 
   const renderActiveView = () => {
     switch (activeTab) {
@@ -83,6 +80,7 @@ export const App: React.FC = () => {
             setActiveTab={setActiveTab} 
             onOpenApprovals={() => setIsApprovalsOpen(true)}
             onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
+            onOpenAICopilot={() => setIsAICopilotOpen(!isAICopilotOpen)}
           />
 
           {/* Canvas Workspace Area */}
@@ -94,9 +92,6 @@ export const App: React.FC = () => {
             margin: '0 auto',
             boxSizing: 'border-box'
           }}>
-            {/* Top Autonomous Command Bar */}
-            <CommandHub onCommandTriggered={handleCommandTriggered} />
-
             {/* Active Module View Protected by RBXGuard */}
             {renderActiveView()}
           </main>
@@ -111,10 +106,17 @@ export const App: React.FC = () => {
             justifyContent: 'space-between',
             alignItems: 'center'
           }}>
-            <div>TalentOS AI — Dynamic Role-Based Experience (RBX) Engine</div>
+            <div>TalentOS AI — Executive AI Copilot Ecosystem (Linear/Cursor Style)</div>
             <div>Enterprise Architecture v1.0 • SOC 2 Type II Certified</div>
           </footer>
         </div>
+
+        {/* Global Floating AI Copilot Widget (Bottom Right 56px Button & 420px Glass Panel) */}
+        <FloatingAICopilot 
+          activeTab={activeTab}
+          isOpen={isAICopilotOpen}
+          setIsOpen={setIsAICopilotOpen}
+        />
 
         {/* Approvals Drawer */}
         <ApprovalsDrawer 

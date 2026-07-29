@@ -15,13 +15,15 @@ interface NavbarProps {
   setActiveTab: (tab: string) => void;
   onOpenApprovals: () => void;
   onOpenCommandPalette: () => void;
+  onOpenAICopilot?: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({ 
   activeTab, 
   setActiveTab, 
   onOpenApprovals, 
-  onOpenCommandPalette 
+  onOpenCommandPalette,
+  onOpenAICopilot
 }) => {
   const [approvalsCount, setApprovalsCount] = React.useState(0);
   const [currentPersona, setCurrentPersona] = React.useState(authStore.getCurrentPersona());
@@ -45,7 +47,6 @@ export const Navbar: React.FC<NavbarProps> = ({
   const handleRoleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newRole = e.target.value as SystemRole;
     authStore.setPersonaByRole(newRole);
-    // If current tab is now forbidden for new role, default to dashboard
     if (!authStore.canAccessModule(activeTab)) {
       setActiveTab('dashboard');
     }
@@ -118,16 +119,16 @@ export const Navbar: React.FC<NavbarProps> = ({
         </div>
 
         <button
-          onClick={() => setActiveTab('orchestrator')}
+          onClick={onOpenAICopilot}
           className="btn-primary"
           style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '6px 12px', fontSize: '0.75rem', backgroundColor: '#10b981', color: '#000' }}
         >
           <Sparkles size={14} />
-          <span>⚡ AI Autonomy Center</span>
+          <span>⚡ AI Copilot</span>
         </button>
 
         <button
-          onClick={onOpenCommandPalette}
+          onClick={onOpenAICopilot}
           className="btn-secondary"
           style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '6px 12px', fontSize: '0.75rem' }}
         >

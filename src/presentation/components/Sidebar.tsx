@@ -43,8 +43,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     {
       title: 'OPERATING SYSTEM',
       items: [
-        { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-        { id: 'orchestrator', label: 'Supervisor (AI Core)', icon: Cpu },
+        { id: 'dashboard', label: 'Executive Dashboard', icon: LayoutDashboard },
         { id: 'analytics', label: 'Executive BI Analytics', icon: BarChart3 }
       ]
     },
@@ -69,6 +68,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         { id: 'learning', label: 'Enterprise Learning', icon: GraduationCap },
         { id: 'assets_compliance', label: 'Assets & Compliance', icon: Laptop },
         { id: 'helpdesk_exit', label: 'Helpdesk & Exit', icon: HelpCircle },
+        { id: 'orchestrator', label: 'Agent Telemetry & DAGs', icon: Cpu },
         { id: 'auth', label: 'Security & Identity', icon: Lock }
       ]
     }
