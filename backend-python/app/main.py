@@ -19,6 +19,7 @@ from app.api.supervisor_routes import router as supervisor_router
 from app.api.integration_routes import router as integration_router
 from app.api.knowledge_routes import router as knowledge_router
 from app.api.notification_routes import router as notification_router
+from app.api.recruitment_routes import router as recruitment_router
 from app.middleware.tenant_middleware import TenantIsolationMiddleware
 
 app = FastAPI(
@@ -47,13 +48,14 @@ app.include_router(supervisor_router, prefix=settings.API_V1_STR)
 app.include_router(integration_router, prefix=settings.API_V1_STR)
 app.include_router(knowledge_router, prefix=settings.API_V1_STR)
 app.include_router(notification_router, prefix=settings.API_V1_STR)
+app.include_router(recruitment_router, prefix=settings.API_V1_STR)
 
 @app.get("/health")
 @app.get(f"{settings.API_V1_STR}/health")
 def health_check():
     return {
         "status": "online",
-        "engine": "Python FastAPI + Identity + Workflow + AI Core + LangGraph Supervisor + Integrations + RAG + Notifications",
+        "engine": "Python FastAPI + Identity + Workflow + AI Core + LangGraph Supervisor + Integrations + RAG + Notifications + Recruitment",
         "version": "1.0.0"
     }
 
@@ -62,7 +64,7 @@ def orchestrate_agent_prompt(req: AgentRequest):
     if not req.prompt.strip():
         raise HTTPException(status_code=400, detail="Prompt cannot be empty.")
     
-    tenant_id = req.tenant_id or settings.DEFAULTTENANT_ID if hasattr(settings, 'DEFAULTTENANT_ID') else "TNT-TALENTOS-01"
+    tenant_id = req.tenant_id or "TNT-TALENTOS-01"
     return PythonLangGraphSupervisor.run_graph(req.prompt, tenant_id)
 
 @app.post(f"{settings.API_V1_STR}/parse-resume", response_model=ResumeParseResponse)
