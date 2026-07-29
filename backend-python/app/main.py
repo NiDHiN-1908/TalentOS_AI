@@ -11,6 +11,15 @@ from app.domain.models import (
     AnomalyItem
 )
 from app.agents.langgraph_supervisor import PythonLangGraphSupervisor
+from app.api.auth_routes import router as auth_router
+from app.api.workflow_routes import router as workflow_router
+from app.api.ai_routes import router as ai_router
+from app.api.ai_core_routes import router as ai_core_router
+from app.api.supervisor_routes import router as supervisor_router
+from app.api.integration_routes import router as integration_router
+from app.api.knowledge_routes import router as knowledge_router
+from app.api.notification_routes import router as notification_router
+from app.middleware.tenant_middleware import TenantIsolationMiddleware
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
@@ -19,7 +28,8 @@ app = FastAPI(
     openapi_url=f"{settings.API_V1_STR}/openapi.json"
 )
 
-# CORS Setup
+# Middleware
+app.add_middleware(TenantIsolationMiddleware)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.CORS_ORIGINS,
@@ -28,12 +38,22 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Routers
+app.include_router(auth_router, prefix=settings.API_V1_STR)
+app.include_router(workflow_router, prefix=settings.API_V1_STR)
+app.include_router(ai_router, prefix=settings.API_V1_STR)
+app.include_router(ai_core_router, prefix=settings.API_V1_STR)
+app.include_router(supervisor_router, prefix=settings.API_V1_STR)
+app.include_router(integration_router, prefix=settings.API_V1_STR)
+app.include_router(knowledge_router, prefix=settings.API_V1_STR)
+app.include_router(notification_router, prefix=settings.API_V1_STR)
+
 @app.get("/health")
 @app.get(f"{settings.API_V1_STR}/health")
 def health_check():
     return {
         "status": "online",
-        "engine": "Python FastAPI + LangGraph Engine",
+        "engine": "Python FastAPI + Identity + Workflow + AI Core + LangGraph Supervisor + Integrations + RAG + Notifications",
         "version": "1.0.0"
     }
 
@@ -42,7 +62,7 @@ def orchestrate_agent_prompt(req: AgentRequest):
     if not req.prompt.strip():
         raise HTTPException(status_code=400, detail="Prompt cannot be empty.")
     
-    tenant_id = req.tenant_id or settings.DEFAULT_TENANT_ID
+    tenant_id = req.tenant_id or settings.DEFAULTTENANT_ID if hasattr(settings, 'DEFAULTTENANT_ID') else "TNT-TALENTOS-01"
     return PythonLangGraphSupervisor.run_graph(req.prompt, tenant_id)
 
 @app.post(f"{settings.API_V1_STR}/parse-resume", response_model=ResumeParseResponse)
