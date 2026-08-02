@@ -1,5 +1,6 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from app.core.config import settings
 from app.domain.models import (
     AgentRequest, 
@@ -50,17 +51,40 @@ app = FastAPI(
     openapi_url=f"{settings.API_V1_STR}/openapi.json"
 )
 
-# Middleware
+# Global Exception Handlers for Enterprise Error Formatting
+@app.exception_handler(HTTPException)
+async def http_exception_handler(request: Request, exc: HTTPException):
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={
+            "error": True,
+            "code": f"HTTP_{exc.status_code}",
+            "message": exc.detail
+        }
+    )
+
+@app.exception_handler(Exception)
+async def generic_exception_handler(request: Request, exc: Exception):
+    return JSONResponse(
+        status_code=500,
+        content={
+            "error": True,
+            "code": "INTERNAL_SERVER_ERROR",
+            "message": "An internal server error occurred."
+        }
+    )
+
+# Security Middleware
 app.add_middleware(TenantIsolationMiddleware)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.CORS_ORIGINS,
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
 )
 
-# Routers
+# Enterprise API Routers
 app.include_router(auth_router, prefix=settings.API_V1_STR)
 app.include_router(workflow_router, prefix=settings.API_V1_STR)
 app.include_router(ai_router, prefix=settings.API_V1_STR)
@@ -97,7 +121,8 @@ app.include_router(optimization_router, prefix=settings.API_V1_STR)
 def health_check():
     return {
         "status": "online",
-        "engine": "Python FastAPI + Identity + Workflow + AI Core + LangGraph Supervisor + Integrations + RAG + Notifications + Recruitment + Candidate Experience + ATS + Resume Intelligence + Interview Intelligence + Assessment Intelligence + Offer Intelligence + Employee Onboarding + Core Employee SSOT + Attendance + Leave + Global Payroll + Performance Management + Enterprise Learning + Enterprise Asset Management + Enterprise GRC + Enterprise Helpdesk + Enterprise Executive AI + Enterprise Workforce Analytics + Enterprise Observability + Enterprise Zero Trust Security + Enterprise Continuous Optimization Platform",
+        "engine": "Python FastAPI Enterprise Agentic HR OS",
+        "security_shield": "Active Zero Trust",
         "version": "1.0.0"
     }
 

@@ -4,7 +4,9 @@ import {
   Search,
   Sparkles,
   ChevronRight,
-  UserCheck
+  UserCheck,
+  Sun,
+  Moon
 } from 'lucide-react';
 import { hrStore } from '../../infrastructure/store/hrStore';
 import { authStore } from '../../infrastructure/store/authStore';
@@ -27,6 +29,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 }) => {
   const [approvalsCount, setApprovalsCount] = React.useState(0);
   const [currentPersona, setCurrentPersona] = React.useState(authStore.getCurrentPersona());
+  const [isLightMode, setIsLightMode] = React.useState(false);
 
   React.useEffect(() => {
     const updateStore = () => setApprovalsCount(hrStore.getApprovals().filter(a => a.status === 'pending').length);
@@ -43,6 +46,16 @@ export const Navbar: React.FC<NavbarProps> = ({
       unsubAuth();
     };
   }, []);
+
+  const toggleTheme = () => {
+    const nextTheme = !isLightMode;
+    setIsLightMode(nextTheme);
+    if (nextTheme) {
+      document.body.classList.add('theme-light');
+    } else {
+      document.body.classList.remove('theme-light');
+    }
+  };
 
   const handleRoleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newRole = e.target.value as SystemRole;
@@ -74,8 +87,8 @@ export const Navbar: React.FC<NavbarProps> = ({
     <header style={{
       height: '56px',
       padding: '0 24px',
-      backgroundColor: '#111726',
-      borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+      backgroundColor: 'var(--bg-surface)',
+      borderBottom: '1px solid var(--border-subtle)',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'space-between',
@@ -85,73 +98,91 @@ export const Navbar: React.FC<NavbarProps> = ({
     }}>
       {/* Breadcrumb Trail */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.82rem' }}>
-        <span style={{ color: '#64748b' }}>Acme Corp</span>
-        <ChevronRight size={14} color="#64748b" />
-        <span style={{ color: '#f8fafc', fontWeight: 600 }}>{getTabTitle(activeTab)}</span>
+        <span style={{ color: 'var(--text-muted)' }}>Acme Corp</span>
+        <ChevronRight size={14} color="var(--text-muted)" />
+        <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>{getTabTitle(activeTab)}</span>
       </div>
 
       {/* Right Controls & Persona Switcher */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
         {/* Dynamic Persona / Role Switcher */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', backgroundColor: '#090d16', border: '1px solid rgba(255, 255, 255, 0.08)', padding: '4px 10px', borderRadius: '6px' }}>
-          <UserCheck size={14} color="#10b981" />
-          <span style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: 600 }}>RBX Persona:</span>
+        <div style={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          gap: '6px', 
+          backgroundColor: 'var(--bg-canvas)', 
+          border: '1px solid var(--border-subtle)', 
+          padding: '4px 10px', 
+          borderRadius: 'var(--radius-sm)' 
+        }}>
+          <UserCheck size={14} color="var(--accent-emerald)" />
+          <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontWeight: 600 }}>RBX Persona:</span>
           <select 
             value={currentPersona.role}
             onChange={handleRoleChange}
             style={{
               backgroundColor: 'transparent',
               border: 'none',
-              color: '#10b981',
+              color: 'var(--accent-emerald)',
               fontWeight: 700,
               fontSize: '0.78rem',
               outline: 'none',
               cursor: 'pointer'
             }}
           >
-            <option value="HR_MANAGER" style={{ backgroundColor: '#090d16', color: '#fff' }}>HR Manager (Elena Rostova)</option>
-            <option value="RECRUITER" style={{ backgroundColor: '#090d16', color: '#fff' }}>Recruiter (Sarah Chen)</option>
-            <option value="PAYROLL_MANAGER" style={{ backgroundColor: '#090d16', color: '#fff' }}>Payroll Manager (Marcus Vance)</option>
-            <option value="EMPLOYEE" style={{ backgroundColor: '#090d16', color: '#fff' }}>Employee (Alex Rivera)</option>
-            <option value="EXECUTIVE" style={{ backgroundColor: '#090d16', color: '#fff' }}>Executive (David Sterling)</option>
-            <option value="PLATFORM_ADMIN" style={{ backgroundColor: '#090d16', color: '#fff' }}>Platform Admin (System)</option>
+            <option value="HR_MANAGER" style={{ backgroundColor: 'var(--bg-canvas)', color: 'var(--text-primary)' }}>HR Manager (Elena Rostova)</option>
+            <option value="RECRUITER" style={{ backgroundColor: 'var(--bg-canvas)', color: 'var(--text-primary)' }}>Recruiter (Sarah Chen)</option>
+            <option value="PAYROLL_MANAGER" style={{ backgroundColor: 'var(--bg-canvas)', color: 'var(--text-primary)' }}>Payroll Manager (Marcus Vance)</option>
+            <option value="EMPLOYEE" style={{ backgroundColor: 'var(--bg-canvas)', color: 'var(--text-primary)' }}>Employee (Alex Rivera)</option>
+            <option value="EXECUTIVE" style={{ backgroundColor: 'var(--bg-canvas)', color: 'var(--text-primary)' }}>Executive (David Sterling)</option>
+            <option value="PLATFORM_ADMIN" style={{ backgroundColor: 'var(--bg-canvas)', color: 'var(--text-primary)' }}>Platform Admin (System)</option>
           </select>
         </div>
+
+        {/* Theme Mode Toggle Button */}
+        <button
+          onClick={toggleTheme}
+          className="btn-ghost"
+          style={{ padding: '6px 8px', borderRadius: 'var(--radius-sm)' }}
+          title={isLightMode ? "Switch to Dark Mode" : "Switch to Light Mode"}
+        >
+          {isLightMode ? <Moon size={15} color="var(--text-secondary)" /> : <Sun size={15} color="var(--text-secondary)" />}
+        </button>
 
         <button
           onClick={onOpenAICopilot}
           className="btn-primary"
-          style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '6px 12px', fontSize: '0.75rem', backgroundColor: '#10b981', color: '#000' }}
+          style={{ padding: '6px 12px', fontSize: '0.75rem' }}
         >
           <Sparkles size={14} />
           <span>⚡ AI Copilot</span>
         </button>
 
         <button
-          onClick={onOpenAICopilot}
+          onClick={onOpenCommandPalette}
           className="btn-secondary"
-          style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '6px 12px', fontSize: '0.75rem' }}
+          style={{ padding: '6px 12px', fontSize: '0.75rem' }}
         >
-          <Search size={13} color="#94a3b8" />
-          <span style={{ color: '#64748b' }}>Search</span>
-          <span style={{ background: 'rgba(255,255,255,0.08)', padding: '1px 5px', borderRadius: '4px', fontSize: '0.68rem', color: '#94a3b8' }}>⌘K</span>
+          <Search size={13} color="var(--text-secondary)" />
+          <span style={{ color: 'var(--text-muted)' }}>Search</span>
+          <span style={{ background: 'var(--border-subtle)', padding: '1px 5px', borderRadius: '4px', fontSize: '0.68rem', color: 'var(--text-secondary)' }}>⌘K</span>
         </button>
 
         <button
           onClick={onOpenApprovals}
           className="btn-secondary"
-          style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: '6px', padding: '6px 12px', fontSize: '0.75rem' }}
+          style={{ position: 'relative', padding: '6px 12px', fontSize: '0.75rem' }}
         >
-          <ShieldAlert size={14} color={approvalsCount > 0 ? '#f43f5e' : '#94a3b8'} />
+          <ShieldAlert size={14} color={approvalsCount > 0 ? 'var(--accent-rose)' : 'var(--text-secondary)'} />
           <span>Approvals</span>
           {approvalsCount > 0 && (
             <span style={{
-              background: '#f43f5e',
-              color: '#fff',
+              background: 'var(--accent-rose)',
+              color: '#ffffff',
               fontSize: '0.65rem',
               fontWeight: 700,
               padding: '1px 6px',
-              borderRadius: '9999px'
+              borderRadius: 'var(--radius-full)'
             }}>
               {approvalsCount}
             </span>

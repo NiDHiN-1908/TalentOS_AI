@@ -84,13 +84,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
     <aside style={{
       width: collapsed ? '64px' : '240px',
       height: '100vh',
-      backgroundColor: '#090d16',
-      borderRight: '1px solid rgba(255, 255, 255, 0.08)',
+      backgroundColor: 'var(--bg-canvas)',
+      borderRight: '1px solid var(--border-subtle)',
       display: 'flex',
       flexDirection: 'column',
       position: 'sticky',
       top: 0,
-      transition: 'width 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+      transition: 'width 0.2s var(--ease-spring)',
       zIndex: 110,
       flexShrink: 0
     }}>
@@ -101,23 +101,24 @@ export const Sidebar: React.FC<SidebarProps> = ({
         display: 'flex',
         alignItems: 'center',
         justifyContent: collapsed ? 'center' : 'space-between',
-        borderBottom: '1px solid rgba(255, 255, 255, 0.08)'
+        borderBottom: '1px solid var(--border-subtle)'
       }}>
         {!collapsed && (
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <div style={{
               width: '28px',
               height: '28px',
-              borderRadius: '6px',
+              borderRadius: 'var(--radius-sm)',
               background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center'
+              justifyContent: 'center',
+              boxShadow: 'var(--glow-emerald)'
             }}>
               <Bot size={16} color="#000" />
             </div>
-            <span style={{ fontWeight: 700, fontSize: '0.98rem', color: '#f8fafc', letterSpacing: '-0.02em' }}>
-              TalentOS <span style={{ color: '#10b981' }}>AI</span>
+            <span style={{ fontWeight: 700, fontSize: '0.98rem', color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>
+              TalentOS <span style={{ color: 'var(--accent-emerald)' }}>AI</span>
             </span>
           </div>
         )}
@@ -126,11 +127,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <div style={{
             width: '30px',
             height: '30px',
-            borderRadius: '6px',
+            borderRadius: 'var(--radius-sm)',
             background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'center'
+            justifyContent: 'center',
+            boxShadow: 'var(--glow-emerald)'
           }}>
             <Bot size={18} color="#000" />
           </div>
@@ -138,17 +140,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
         <button
           onClick={() => setCollapsed(!collapsed)}
+          className="btn-ghost"
           style={{
-            background: 'none',
-            border: 'none',
-            color: '#64748b',
-            cursor: 'pointer',
             padding: '4px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            borderRadius: '4px',
-            transition: 'color 0.15s ease'
+            borderRadius: 'var(--radius-xs)'
           }}
           title={collapsed ? "Expand Sidebar" : "Collapse Sidebar"}
         >
@@ -171,7 +166,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <div style={{
                 fontSize: '0.65rem',
                 fontWeight: 700,
-                color: '#64748b',
+                color: 'var(--text-muted)',
                 letterSpacing: '0.08em',
                 marginBottom: '8px',
                 paddingLeft: '8px'
@@ -194,10 +189,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       alignItems: 'center',
                       gap: '10px',
                       padding: collapsed ? '10px' : '8px 12px',
-                      borderRadius: '6px',
+                      borderRadius: 'var(--radius-sm)',
                       border: 'none',
-                      backgroundColor: isActive ? 'rgba(16, 185, 129, 0.14)' : 'transparent',
-                      color: isActive ? '#10b981' : '#94a3b8',
+                      backgroundColor: isActive ? 'var(--accent-emerald-subtle)' : 'transparent',
+                      color: isActive ? 'var(--accent-emerald)' : 'var(--text-secondary)',
                       fontWeight: isActive ? 600 : 500,
                       fontSize: '0.82rem',
                       cursor: 'pointer',
@@ -206,7 +201,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       transition: 'all 0.15s ease'
                     }}
                   >
-                    <Icon size={16} color={isActive ? '#10b981' : '#94a3b8'} />
+                    <Icon size={16} color={isActive ? 'var(--accent-emerald)' : 'var(--text-secondary)'} />
                     {!collapsed && <span>{item.label}</span>}
                   </button>
                 );
@@ -220,15 +215,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
       {!collapsed && (
         <div style={{
           padding: '12px 16px',
-          borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+          borderTop: '1px solid var(--border-subtle)',
           fontSize: '0.72rem',
-          color: '#64748b',
+          color: 'var(--text-muted)',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center'
         }}>
           <div>
-            <div style={{ color: '#f8fafc', fontWeight: 600 }}>{persona.name}</div>
+            <div style={{ color: 'var(--text-primary)', fontWeight: 600 }}>{persona.name}</div>
             <div>{persona.role}</div>
           </div>
           <span className="badge badge-indigo" style={{ fontSize: '0.62rem', padding: '1px 6px' }}>Active RBX</span>

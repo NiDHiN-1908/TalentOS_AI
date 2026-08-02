@@ -1,29 +1,48 @@
 import React from 'react';
-import { Lock, ShieldAlert } from 'lucide-react';
+import { Lock } from 'lucide-react';
 import { authStore } from '../../infrastructure/store/authStore';
 
 interface RBXGuardProps {
-  moduleId: string;
+  moduleId?: string;
+  requiredPermission?: string;
+  fallback?: React.ReactNode;
   children: React.ReactNode;
 }
 
-export const RBXGuard: React.FC<RBXGuardProps> = ({ moduleId, children }) => {
-  const [canAccess, setCanAccess] = React.useState(authStore.canAccessModule(moduleId));
+export const RBXGuard: React.FC<RBXGuardProps> = ({ 
+  moduleId, 
+  requiredPermission, 
+  fallback, 
+  children 
+}) => {
+  const [authorized, setAuthorized] = React.useState(() => {
+    if (moduleId && !authStore.canAccessModule(moduleId)) return false;
+    if (requiredPermission && !authStore.hasPermission(requiredPermission)) return false;
+    return true;
+  });
+
   const persona = authStore.getCurrentPersona();
 
   React.useEffect(() => {
-    const update = () => setCanAccess(authStore.canAccessModule(moduleId));
+    const update = () => {
+      let isAuth = true;
+      if (moduleId && !authStore.canAccessModule(moduleId)) isAuth = false;
+      if (requiredPermission && !authStore.hasPermission(requiredPermission)) isAuth = false;
+      setAuthorized(isAuth);
+    };
     update();
     return authStore.subscribe(update);
-  }, [moduleId]);
+  }, [moduleId, requiredPermission]);
 
-  if (!canAccess) {
+  if (!authorized) {
+    if (fallback) return <>{fallback}</>;
+
     return (
       <div style={{
         padding: '60px 24px',
-        backgroundColor: '#111726',
-        border: '1px solid rgba(244, 63, 94, 0.25)',
-        borderRadius: '10px',
+        backgroundColor: 'var(--bg-surface)',
+        border: '1px solid var(--accent-rose-subtle)',
+        borderRadius: 'var(--radius-md)',
         textAlign: 'center',
         display: 'flex',
         flexDirection: 'column',
@@ -35,29 +54,29 @@ export const RBXGuard: React.FC<RBXGuardProps> = ({ moduleId, children }) => {
           width: '56px',
           height: '56px',
           borderRadius: '50%',
-          backgroundColor: 'rgba(244, 63, 94, 0.12)',
+          backgroundColor: 'var(--accent-rose-subtle)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           marginBottom: '16px'
         }}>
-          <Lock size={28} color="#f43f5e" />
+          <Lock size={28} color="var(--accent-rose)" />
         </div>
 
-        <span className="badge badge-warning" style={{ marginBottom: '10px', backgroundColor: 'rgba(244, 63, 94, 0.15)', color: '#f43f5e' }}>
+        <span className="badge badge-danger" style={{ marginBottom: '10px' }}>
           403 FORBIDDEN — ACCESS DENIED
         </span>
 
-        <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#f8fafc', margin: '0 0 8px 0' }}>
+        <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--text-primary)', margin: '0 0 8px 0' }}>
           Unauthorized Module Access
         </h3>
 
-        <p style={{ color: '#94a3b8', fontSize: '0.85rem', maxWidth: '520px', lineHeight: 1.5, margin: '0 0 20px 0' }}>
-          Your current active persona (<strong style={{ color: '#f8fafc' }}>{persona.name} — {persona.role}</strong>) does not have authorization to view or execute operations in this domain.
+        <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', maxWidth: '520px', lineHeight: 1.5, margin: '0 0 20px 0' }}>
+          Your current active persona (<strong style={{ color: 'var(--text-primary)' }}>{persona.name} — {persona.role}</strong>) does not have authorization to view or execute operations in this domain.
         </p>
 
-        <div style={{ fontSize: '0.78rem', color: '#64748b', backgroundColor: '#090d16', padding: '10px 16px', borderRadius: '6px', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
-          To test this module, switch your active persona to <strong style={{ color: '#10b981' }}>HR Manager</strong> or <strong style={{ color: '#10b981' }}>Platform Admin</strong> using the Role Switcher in the top navigation bar.
+        <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', backgroundColor: 'var(--bg-canvas)', padding: '10px 16px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-subtle)' }}>
+          To test this module, switch your active persona using the RBX Persona Selector in the top navigation bar.
         </div>
       </div>
     );

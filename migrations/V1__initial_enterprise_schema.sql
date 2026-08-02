@@ -1,5 +1,5 @@
--- TalentOS AI — Production Database Migration Script V1
--- Enterprise Multi-Tenant Normalized Schema (24 Table Domains)
+-- TalentOS AI — Production Database Migration Script V1 (Optimized)
+-- Enterprise Multi-Tenant Normalized Schema (24 Table Domains + Index Acceleration + Full RLS)
 
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
@@ -156,8 +156,8 @@ CREATE TABLE payroll_runs (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     org_id UUID NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
     period_name VARCHAR(50) NOT NULL,
-    total_gross NUMERIC(14, 2) NOT NULL DEFAULT 0.00,
-    employee_count INT NOT NULL DEFAULT 0,
+    total_gross NUMERIC(14, 2) NOT NULL DEFAULT 0.00 CHECK (total_gross >= 0),
+    employee_count INT NOT NULL DEFAULT 0 CHECK (employee_count >= 0),
     status VARCHAR(50) NOT NULL DEFAULT 'Draft',
     created_at TIMESTAMPTZ NOT NULL DEFAULT clock_timestamp()
 );
@@ -166,10 +166,10 @@ CREATE TABLE payroll_line_items (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     payroll_run_id UUID NOT NULL REFERENCES payroll_runs(id) ON DELETE CASCADE,
     employee_id UUID NOT NULL REFERENCES employees(id),
-    base_pay NUMERIC(12, 2) NOT NULL,
-    bonus NUMERIC(12, 2) DEFAULT 0.00,
-    deductions NUMERIC(12, 2) DEFAULT 0.00,
-    net_pay NUMERIC(12, 2) NOT NULL,
+    base_pay NUMERIC(12, 2) NOT NULL CHECK (base_pay >= 0),
+    bonus NUMERIC(12, 2) DEFAULT 0.00 CHECK (bonus >= 0),
+    deductions NUMERIC(12, 2) DEFAULT 0.00 CHECK (deductions >= 0),
+    net_pay NUMERIC(12, 2) NOT NULL CHECK (net_pay >= 0),
     PRIMARY KEY (payroll_run_id, employee_id)
 );
 
@@ -316,24 +316,49 @@ CREATE TABLE approval_requests (
     created_at TIMESTAMPTZ NOT NULL DEFAULT clock_timestamp()
 );
 
--- Indexing Optimizations
+-- Foreign Key & Multitenant Indexing Optimizations
+CREATE INDEX idx_users_org_id ON users(org_id);
+CREATE INDEX idx_roles_org_id ON roles(org_id);
+CREATE INDEX idx_departments_org_id ON departments(org_id);
 CREATE INDEX idx_employees_org_dept ON employees(org_id, department_id);
+CREATE INDEX idx_employees_user_id ON employees(user_id);
+CREATE INDEX idx_jobs_org_dept ON jobs(org_id, department_id);
 CREATE INDEX idx_candidates_org_score ON candidates(org_id, ai_match_score DESC);
+CREATE INDEX idx_job_applications_job_cand ON job_applications(job_id, candidate_id);
+CREATE INDEX idx_interviews_app_id ON interviews(application_id);
+CREATE INDEX idx_attendance_emp_date ON attendance_records(employee_id, work_date DESC);
+CREATE INDEX idx_leave_emp_status ON leave_requests(employee_id, status);
+CREATE INDEX idx_payroll_runs_org ON payroll_runs(org_id, created_at DESC);
+CREATE INDEX idx_payroll_line_items_run ON payroll_line_items(payroll_run_id);
+CREATE INDEX idx_payroll_anomalies_run ON payroll_anomalies(payroll_run_id, resolved);
+CREATE INDEX idx_performance_emp_period ON performance_reviews(employee_id, created_at DESC);
+CREATE INDEX idx_assets_org_status ON assets(org_id, status);
+CREATE INDEX idx_learning_tracks_emp ON learning_tracks(employee_id, status);
 CREATE INDEX idx_audit_logs_org_time ON audit_logs(org_id, created_at DESC);
 CREATE INDEX idx_audit_logs_details_gin ON audit_logs USING GIN (details);
+CREATE INDEX idx_workflow_dags_org_status ON workflow_dags(org_id, status);
+CREATE INDEX idx_workflow_steps_dag ON workflow_steps(dag_id, step_order);
 
 -- HNSW Vector Acceleration Index
 CREATE INDEX idx_vector_embeddings_hnsw ON vector_embeddings 
 USING hnsw (embedding vector_cosine_ops) 
 WITH (m = 16, ef_construction = 64);
 
--- Row-Level Security Policies
+-- Complete Row-Level Security Policies across Multi-Tenant Domains
 ALTER TABLE employees ENABLE ROW LEVEL SECURITY;
 ALTER TABLE candidates ENABLE ROW LEVEL SECURITY;
 ALTER TABLE payroll_runs ENABLE ROW LEVEL SECURITY;
 ALTER TABLE audit_logs ENABLE ROW LEVEL SECURITY;
+ALTER TABLE jobs ENABLE ROW LEVEL SECURITY;
+ALTER TABLE workflow_dags ENABLE ROW LEVEL SECURITY;
+ALTER TABLE ai_memories ENABLE ROW LEVEL SECURITY;
+ALTER TABLE vector_embeddings ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY tenant_isolation_employees ON employees FOR ALL USING (org_id = current_setting('app.current_org_id')::uuid);
 CREATE POLICY tenant_isolation_candidates ON candidates FOR ALL USING (org_id = current_setting('app.current_org_id')::uuid);
 CREATE POLICY tenant_isolation_payroll ON payroll_runs FOR ALL USING (org_id = current_setting('app.current_org_id')::uuid);
 CREATE POLICY tenant_isolation_audit ON audit_logs FOR ALL USING (org_id = current_setting('app.current_org_id')::uuid);
+CREATE POLICY tenant_isolation_jobs ON jobs FOR ALL USING (org_id = current_setting('app.current_org_id')::uuid);
+CREATE POLICY tenant_isolation_dags ON workflow_dags FOR ALL USING (org_id = current_setting('app.current_org_id')::uuid);
+CREATE POLICY tenant_isolation_memories ON ai_memories FOR ALL USING (org_id = current_setting('app.current_org_id')::uuid);
+CREATE POLICY tenant_isolation_vectors ON vector_embeddings FOR ALL USING (org_id = current_setting('app.current_org_id')::uuid);

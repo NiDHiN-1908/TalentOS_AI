@@ -61,7 +61,7 @@ export const App: React.FC = () => {
 
   return (
     <ErrorBoundary>
-      <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: '#090d16' }}>
+      <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: 'var(--bg-canvas)' }}>
         
         {/* Enterprise Collapsible Left Sidebar */}
         <Sidebar 
@@ -99,9 +99,9 @@ export const App: React.FC = () => {
           {/* Footer */}
           <footer style={{
             padding: '16px 32px',
-            borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+            borderTop: '1px solid var(--border-subtle)',
             fontSize: '0.75rem',
-            color: '#64748b',
+            color: 'var(--text-muted)',
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center'
@@ -111,7 +111,7 @@ export const App: React.FC = () => {
           </footer>
         </div>
 
-        {/* Global Floating AI Copilot Widget (Bottom Right 56px Button & 420px Glass Panel) */}
+        {/* Global Floating AI Copilot Widget */}
         <FloatingAICopilot 
           activeTab={activeTab}
           isOpen={isAICopilotOpen}

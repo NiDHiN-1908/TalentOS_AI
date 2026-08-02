@@ -6,6 +6,14 @@ export type SystemRole =
   | 'PAYROLL_MANAGER'
   | 'EMPLOYEE';
 
+export interface AttributeContext {
+  department?: string;
+  region?: string;
+  maxApprovalLimitUsd?: number;
+  ipWhitelist?: string[];
+  clearanceLevel?: 'PUBLIC' | 'CONFIDENTIAL' | 'RESTRICTED';
+}
+
 export interface UserPersona {
   id: string;
   name: string;
@@ -15,6 +23,7 @@ export interface UserPersona {
   title: string;
   tenantId: string;
   permissions: string[];
+  attributes?: AttributeContext;
 }
 
 export const PRESET_PERSONAS: Record<SystemRole, UserPersona> = {
@@ -26,7 +35,13 @@ export const PRESET_PERSONAS: Record<SystemRole, UserPersona> = {
     department: 'Engineering',
     title: 'Senior Software Engineer',
     tenantId: 'TNT-TALENTOS-01',
-    permissions: ['read:self_profile', 'read:self_payroll', 'read:self_attendance', 'request:leave', 'access:learning', 'access:helpdesk']
+    permissions: ['read:self_profile', 'read:self_payroll', 'read:self_attendance', 'request:leave', 'access:learning', 'access:helpdesk'],
+    attributes: {
+      department: 'Engineering',
+      region: 'US-WEST',
+      maxApprovalLimitUsd: 1000,
+      clearanceLevel: 'PUBLIC'
+    }
   },
   RECRUITER: {
     id: 'USR-REC-01',
@@ -36,7 +51,13 @@ export const PRESET_PERSONAS: Record<SystemRole, UserPersona> = {
     department: 'Talent Acquisition',
     title: 'Lead Technical Recruiter',
     tenantId: 'TNT-TALENTOS-01',
-    permissions: ['read:self_profile', 'read:recruitment', 'write:recruitment', 'create:jobs', 'schedule:interviews', 'generate:offers']
+    permissions: ['read:self_profile', 'read:recruitment', 'write:recruitment', 'create:jobs', 'schedule:interviews', 'generate:offers'],
+    attributes: {
+      department: 'Talent Acquisition',
+      region: 'GLOBAL',
+      maxApprovalLimitUsd: 10000,
+      clearanceLevel: 'CONFIDENTIAL'
+    }
   },
   PAYROLL_MANAGER: {
     id: 'USR-PAY-01',
@@ -46,7 +67,13 @@ export const PRESET_PERSONAS: Record<SystemRole, UserPersona> = {
     department: 'Finance',
     title: 'Global Payroll Director',
     tenantId: 'TNT-TALENTOS-01',
-    permissions: ['read:self_profile', 'read:payroll', 'write:payroll', 'audit:payroll', 'access:attendance']
+    permissions: ['read:self_profile', 'read:payroll', 'write:payroll', 'audit:payroll', 'access:attendance'],
+    attributes: {
+      department: 'Finance',
+      region: 'GLOBAL',
+      maxApprovalLimitUsd: 250000,
+      clearanceLevel: 'RESTRICTED'
+    }
   },
   HR_MANAGER: {
     id: 'USR-HRM-01',
@@ -56,7 +83,13 @@ export const PRESET_PERSONAS: Record<SystemRole, UserPersona> = {
     department: 'People Ops',
     title: 'VP of People & Culture',
     tenantId: 'TNT-TALENTOS-01',
-    permissions: ['read:employees', 'write:employees', 'read:recruitment', 'read:onboarding', 'read:performance', 'read:assets', 'read:helpdesk']
+    permissions: ['read:employees', 'write:employees', 'read:recruitment', 'read:onboarding', 'read:performance', 'read:assets', 'read:helpdesk', 'read:payroll'],
+    attributes: {
+      department: 'People Ops',
+      region: 'GLOBAL',
+      maxApprovalLimitUsd: 100000,
+      clearanceLevel: 'CONFIDENTIAL'
+    }
   },
   EXECUTIVE: {
     id: 'USR-EXEC-01',
@@ -66,7 +99,13 @@ export const PRESET_PERSONAS: Record<SystemRole, UserPersona> = {
     department: 'Executive Office',
     title: 'Chief Executive Officer',
     tenantId: 'TNT-TALENTOS-01',
-    permissions: ['read:executive_analytics', 'read:bi_reports', 'read:org_health', 'access:strategic_ai', 'read:compliance']
+    permissions: ['read:executive_analytics', 'read:bi_reports', 'read:org_health', 'access:strategic_ai', 'read:compliance'],
+    attributes: {
+      department: 'Executive Office',
+      region: 'GLOBAL',
+      maxApprovalLimitUsd: 1000000,
+      clearanceLevel: 'RESTRICTED'
+    }
   },
   PLATFORM_ADMIN: {
     id: 'USR-ADM-01',
@@ -76,6 +115,12 @@ export const PRESET_PERSONAS: Record<SystemRole, UserPersona> = {
     department: 'Platform Engineering',
     title: 'Chief System Administrator',
     tenantId: 'TNT-TALENTOS-01',
-    permissions: ['*']
+    permissions: ['*'],
+    attributes: {
+      department: 'Platform Engineering',
+      region: 'GLOBAL',
+      maxApprovalLimitUsd: 99999999,
+      clearanceLevel: 'RESTRICTED'
+    }
   }
 };
