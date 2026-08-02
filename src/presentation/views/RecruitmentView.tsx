@@ -137,28 +137,33 @@ export const RecruitmentView: React.FC = () => {
     }
   };
 
-  const exchangeCandidates: ExchangeCandidate[] = candidates.map((c, index) => ({
-    ...c,
-    classification: getClassification(c.matchScore, c.status),
-    channelSource: index % 3 === 0 ? 'Company Career Portal' : index % 3 === 1 ? 'Employee Referral' : 'Email Mailbox Ingest',
-    explanation: `Candidate demonstrates ${c.matchScore}% semantic match against target requirements with strong experience in ${c.skills.slice(0, 3).join(', ')}.`,
-    isDuplicate: index === 2,
-    duplicateOfId: index === 2 ? 'CAN-101' : undefined,
-    timeline: [
-      { title: 'Application Collected', time: 'Aug 01, 10:14 AM', channel: index % 3 === 0 ? 'Company Career Portal' : index % 3 === 1 ? 'Employee Referral' : 'Email Mailbox', status: 'completed' },
-      { title: 'Resume Intelligence OCR Parsed', time: 'Aug 01, 10:15 AM', channel: 'TalentOS AI Core', status: 'completed' },
-      { title: 'Multi-Attribute Duplicate Check', time: 'Aug 01, 10:15 AM', channel: 'Database Security Engine', status: 'completed' },
-      { title: `AI Screening Match (${c.matchScore}%)`, time: 'Aug 01, 10:16 AM', channel: 'LangGraph Supervisor Agent', status: 'completed' },
-      { title: 'Interview Scheduling & Offer Stage', time: 'Pending Supervision', channel: 'Recruiter Workstation', status: 'in_progress' }
-    ]
-  }));
+  const exchangeCandidates: ExchangeCandidate[] = candidates.map((c, index) => {
+    const skillsList = Array.isArray(c.skills) ? c.skills : [];
+    return {
+      ...c,
+      skills: skillsList,
+      classification: getClassification(c.matchScore || 0, c.status || ''),
+      channelSource: index % 3 === 0 ? 'Company Career Portal' : index % 3 === 1 ? 'Employee Referral' : 'Email Mailbox Ingest',
+      explanation: `Candidate demonstrates ${c.matchScore || 0}% semantic match against target requirements with strong experience in ${skillsList.slice(0, 3).join(', ') || 'relevant fields'}.`,
+      isDuplicate: index === 2,
+      duplicateOfId: index === 2 ? 'CAN-101' : undefined,
+      timeline: [
+        { title: 'Application Collected', time: 'Aug 01, 10:14 AM', channel: index % 3 === 0 ? 'Company Career Portal' : index % 3 === 1 ? 'Employee Referral' : 'Email Mailbox', status: 'completed' },
+        { title: 'Resume Intelligence OCR Parsed', time: 'Aug 01, 10:15 AM', channel: 'TalentOS AI Core', status: 'completed' },
+        { title: 'Multi-Attribute Duplicate Check', time: 'Aug 01, 10:15 AM', channel: 'Database Security Engine', status: 'completed' },
+        { title: `AI Screening Match (${c.matchScore || 0}%)`, time: 'Aug 01, 10:16 AM', channel: 'LangGraph Supervisor Agent', status: 'completed' },
+        { title: 'Interview Scheduling & Offer Stage', time: 'Pending Supervision', channel: 'Recruiter Workstation', status: 'in_progress' }
+      ]
+    };
+  });
 
   const filteredCandidates = exchangeCandidates.filter(c => {
     const q = searchQuery.toLowerCase();
     const prompt = aiQueryPrompt.toLowerCase();
+    const skillsList = Array.isArray(c.skills) ? c.skills : [];
     
-    const matchesSearch = c.name.toLowerCase().includes(q) || c.appliedRole.toLowerCase().includes(q) || c.skills.some(s => s.toLowerCase().includes(q));
-    const matchesPrompt = !prompt || c.name.toLowerCase().includes(prompt) || c.appliedRole.toLowerCase().includes(prompt) || c.skills.some(s => s.toLowerCase().includes(prompt)) || (prompt.includes('python') && c.skills.some(s => s.toLowerCase().includes('python'))) || (prompt.includes('langgraph') && c.skills.some(s => s.toLowerCase().includes('agent')));
+    const matchesSearch = (c.name || '').toLowerCase().includes(q) || (c.appliedRole || '').toLowerCase().includes(q) || skillsList.some(s => (s || '').toLowerCase().includes(q));
+    const matchesPrompt = !prompt || (c.name || '').toLowerCase().includes(prompt) || (c.appliedRole || '').toLowerCase().includes(prompt) || skillsList.some(s => (s || '').toLowerCase().includes(prompt)) || (prompt.includes('python') && skillsList.some(s => (s || '').toLowerCase().includes('python'))) || (prompt.includes('langgraph') && skillsList.some(s => (s || '').toLowerCase().includes('agent')));
 
     return matchesSearch && matchesPrompt;
   });
@@ -349,6 +354,145 @@ export const RecruitmentView: React.FC = () => {
                 ))}
               </tbody>
             </table>
+          </div>
+        </div>
+      )}
+
+      {/* Free Publishing Channels View */}
+      {activeTab === 'jobs' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <div style={{ backgroundColor: '#111726', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '10px', padding: '18px 22px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div>
+              <h3 style={{ fontSize: '1.05rem', fontWeight: 700, margin: 0, color: '#f8fafc', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Globe size={18} color="#10b981" /> Active Requisitions & Free Publishing Distribution Channels ({jobs.length})
+              </h3>
+              <p style={{ fontSize: '0.8rem', color: '#94a3b8', margin: '4px 0 0 0' }}>
+                Vacancies are automatically published to the Company Career Portal & Google Jobs Schema.org structured data network.
+              </p>
+            </div>
+            <button onClick={() => setIsJobModalOpen(true)} className="btn-primary" style={{ fontSize: '0.78rem' }}>
+              <Plus size={14} /> Create Requisition
+            </button>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '16px' }}>
+            {jobs.map((j) => (
+              <div key={j.id} style={{ backgroundColor: '#111726', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '10px', padding: '18px 20px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                <div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
+                    <div>
+                      <h3 style={{ fontSize: '1.02rem', fontWeight: 700, margin: 0, color: '#f8fafc' }}>{j.title}</h3>
+                      <div style={{ fontSize: '0.78rem', color: '#94a3b8', marginTop: '2px' }}>{j.department} • {j.location}</div>
+                    </div>
+                    <span className="badge badge-success">{j.status}</span>
+                  </div>
+                  <p style={{ fontSize: '0.8rem', color: '#64748b', margin: '8px 0 12px 0' }}>{j.description}</p>
+                  <div style={{ fontSize: '0.78rem', color: '#10b981', fontWeight: 600, marginBottom: '12px' }}>
+                    Target Salary: ${j.salaryMin.toLocaleString()} - ${j.salaryMax.toLocaleString()} {j.currency}
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', gap: '8px', borderTop: '1px solid rgba(255, 255, 255, 0.06)', paddingTop: '12px' }}>
+                  <button 
+                    onClick={() => {
+                      setSelectedJobForSchema(j);
+                      setIsSchemaModalOpen(true);
+                    }}
+                    className="btn-secondary" 
+                    style={{ flex: 1, fontSize: '0.75rem', justifyContent: 'center' }}
+                  >
+                    <Search size={12} /> Google Jobs Schema
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Free Ingestion Drivers View */}
+      {activeTab === 'free_channels' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          <div style={{ display: 'flex', gap: '12px' }}>
+            <button onClick={() => setIsCsvModalOpen(true)} className="btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.78rem' }}>
+              <FileCode size={14} color="#a855f7" /> Bulk CSV / Excel Candidate Import
+            </button>
+            <button onClick={() => setIsCampusModalOpen(true)} className="btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.78rem' }}>
+              <School size={14} color="#ec4899" /> Campus & University Drive Intake
+            </button>
+          </div>
+
+          <div style={{ backgroundColor: '#111726', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '10px', padding: '20px' }}>
+            <h3 style={{ fontSize: '1.02rem', fontWeight: 700, margin: '0 0 14px 0', color: '#f8fafc', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Zap size={18} color="#10b981" /> Live Ingestion Stream across 13 Free Channels
+            </h3>
+            <table className="table-container">
+              <thead className="table-header">
+                <tr>
+                  <th>Candidate Name & ID</th>
+                  <th>Channel Driver</th>
+                  <th>Email</th>
+                  <th>Ingestion Status</th>
+                  <th>Timestamp</th>
+                </tr>
+              </thead>
+              <tbody>
+                {ingestionLogs.map((log, idx) => (
+                  <tr key={idx} className="table-row">
+                    <td style={{ fontWeight: 600, color: '#f8fafc' }}>
+                      {log.candidateName}
+                      <div style={{ fontSize: '0.72rem', color: '#64748b' }}>{log.candidateId}</div>
+                    </td>
+                    <td style={{ color: '#10b981', fontWeight: 600 }}>{log.channelName}</td>
+                    <td style={{ color: '#94a3b8' }}>{log.candidateEmail}</td>
+                    <td><span className="badge badge-indigo">{log.status}</span></td>
+                    <td style={{ color: '#64748b', fontSize: '0.78rem' }}>{log.timestamp}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* Candidate Portal View */}
+      {activeTab === 'portal' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          <div style={{ backgroundColor: '#111726', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '12px', padding: '24px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
+              <Globe size={22} color="#10b981" />
+              <h3 style={{ fontSize: '1.15rem', fontWeight: 700, margin: 0, color: '#f8fafc' }}>Company Candidate Self-Service Portal</h3>
+              <span className="badge badge-success">Live Candidate Facing UI</span>
+            </div>
+            <p style={{ color: '#94a3b8', fontSize: '0.84rem', margin: 0 }}>
+              Self-hosted candidate application submission and status tracking portal (`careers.acme.corp`).
+            </p>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: '20px' }}>
+            <div style={{ backgroundColor: '#111726', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '10px', padding: '20px' }}>
+              <h4 style={{ fontSize: '0.95rem', fontWeight: 700, color: '#f8fafc', marginBottom: '14px' }}>Candidate Application Status Tracker</h4>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                {candidates.slice(0, 3).map(c => (
+                  <div key={c.id} style={{ backgroundColor: '#090d16', border: '1px solid rgba(255, 255, 255, 0.06)', padding: '14px', borderRadius: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div>
+                      <div style={{ fontWeight: 600, color: '#f8fafc' }}>{c.name}</div>
+                      <div style={{ fontSize: '0.78rem', color: '#94a3b8', marginTop: '2px' }}>{c.appliedRole}</div>
+                    </div>
+                    <span className="badge badge-emerald">{c.status}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div style={{ backgroundColor: '#111726', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '10px', padding: '20px' }}>
+              <h4 style={{ fontSize: '0.95rem', fontWeight: 700, color: '#f8fafc', marginBottom: '12px' }}>Portal Settings</h4>
+              <div style={{ fontSize: '0.8rem', color: '#94a3b8', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <div>Portal Domain: <strong style={{ color: '#10b981' }}>careers.acme.corp</strong></div>
+                <div>SSL Certificate: <span className="badge badge-success">Valid (TLS 1.3)</span></div>
+                <div>Status: <span className="badge badge-indigo">Auto-Publish Active</span></div>
+              </div>
+            </div>
           </div>
         </div>
       )}

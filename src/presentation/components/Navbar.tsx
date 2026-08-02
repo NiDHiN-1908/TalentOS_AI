@@ -139,6 +139,25 @@ export const Navbar: React.FC<NavbarProps> = ({
           </select>
         </div>
 
+        {/* AI Autonomous Autopilot Mode Toggle Switch */}
+        <button
+          onClick={() => hrStore.setAiAutonomousMode(!hrStore.isAiAutonomousMode())}
+          className={hrStore.isAiAutonomousMode() ? "btn-primary" : "btn-secondary"}
+          style={{ 
+            padding: '5px 10px', 
+            fontSize: '0.72rem', 
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: '5px',
+            backgroundColor: hrStore.isAiAutonomousMode() ? '#059669' : 'transparent',
+            borderColor: hrStore.isAiAutonomousMode() ? '#10b981' : 'var(--border-subtle)'
+          }}
+          title="Toggle AI Autonomous Execution Autopilot Mode"
+        >
+          <Sparkles size={13} color={hrStore.isAiAutonomousMode() ? '#ffffff' : '#10b981'} />
+          <span>{hrStore.isAiAutonomousMode() ? '🤖 AI AUTO: ON' : '🤖 AI AUTO: OFF'}</span>
+        </button>
+
         {/* Theme Mode Toggle Button */}
         <button
           onClick={toggleTheme}

@@ -291,7 +291,7 @@ export const AgentOrchestratorView: React.FC = () => {
               flexDirection: 'column',
               gap: '6px'
             }}>
-              {auditLogs.slice(0, 10).map((log) => (
+              {(auditLogs || []).slice(0, 10).map((log) => (
                 <div key={log.id} style={{ display: 'flex', gap: '10px', color: '#94a3b8' }}>
                   <span style={{ color: '#64748b' }}>{new Date(log.timestamp).toLocaleTimeString()}</span>
                   <span style={{ color: '#6366f1', fontWeight: 600 }}>[{log.actor}]</span>

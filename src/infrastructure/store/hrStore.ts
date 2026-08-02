@@ -270,6 +270,7 @@ class HRStore {
   private approvals: ApprovalRequest[] = [...INITIAL_APPROVALS];
   private learningTracks: LearningTrack[] = [...INITIAL_LEARNING_TRACKS];
   private performanceSummaries: PerformanceReviewSummary[] = [...INITIAL_PERFORMANCE_SUMMARIES];
+  private aiAutonomousMode: boolean = false;
   private activeDAG: AgentExecutionDAG | null = null;
   private listeners: Set<() => void> = new Set();
 
@@ -290,7 +291,14 @@ class HRStore {
   public getApprovals(): ApprovalRequest[] { return this.approvals.filter(a => a.tenantId === this.currentTenantId); }
   public getLearningTracks(): LearningTrack[] { return this.learningTracks.filter(l => l.tenantId === this.currentTenantId); }
   public getPerformanceSummaries(): PerformanceReviewSummary[] { return this.performanceSummaries.filter(p => p.tenantId === this.currentTenantId); }
+  public isAiAutonomousMode(): boolean { return this.aiAutonomousMode; }
   public getActiveDAG(): AgentExecutionDAG | null { return this.activeDAG; }
+
+  public setAiAutonomousMode(enabled: boolean) {
+    this.aiAutonomousMode = enabled;
+    AuditService.log(this.currentTenantId, 'SUPERVISOR_AGENT', 'AI_AUTONOMOUS_MODE_TOGGLED', `AI Autopilot Mode set to ${enabled}`, 'SUPERVISOR');
+    this.notify();
+  }
 
   // Mutations with Audit Dispatch
   public setActiveDAG(dag: AgentExecutionDAG | null) {
