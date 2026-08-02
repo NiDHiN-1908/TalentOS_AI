@@ -14,6 +14,17 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+      - name: Setup .NET 9 SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Restore & Build ASP.NET Core (.NET 9) Microservices
+        run: |
+          cd backend-dotnet
+          dotnet restore TalentOS.sln
+          dotnet build TalentOS.sln --configuration Release
+
       - name: Set up Python 3.11
         uses: actions/setup-python@v5
         with:
@@ -70,6 +81,13 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build & Push ASP.NET Core Gateway Container Image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend-dotnet
+          push: true
+          tags: ghcr.io/nidhin-1908/talentos-ai-dotnet-gateway:latest
 
       - name: Build & Push FastAPI Backend Image
         uses: docker/build-push-action@v5
